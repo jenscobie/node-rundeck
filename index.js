@@ -1,1 +1,1 @@
-module.exports = require('./src/lib/rundeck');
+module.exports = require('./src/rundeck');

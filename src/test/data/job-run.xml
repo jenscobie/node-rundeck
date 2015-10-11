@@ -1,5 +1,5 @@
 <executions count='1'>
-    <execution id='1' href='http://localhost:4440/execution/follow/1' status='running' project='Project'>
+    <execution id='1' href='http://example.com:4000/execution/follow/1' status='running' project='Project'>
         <user>admin</user>
         <date-started unixtime='1444515964729'>2015-10-10T22:26:04Z</date-started>
         <job id='1234' averageDuration='1910'>

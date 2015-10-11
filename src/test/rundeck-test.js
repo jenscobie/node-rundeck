@@ -6,23 +6,27 @@ var Rundeck = require('../rundeck');
 
 describe('Rundeck', function () {
   describe('Initialization', function () {
-    it('should throw an error when no options specified', function () {
-      assert.throws(function () { new Rundeck(); }, /No options set/);
+    it('should throw an error when no host specified', function () {
+      assert.throws(function () { new Rundeck({}); }, /Required option host not set/);
     });
 
-    it('should throw an error when no serverUrl specified', function () {
-      assert.throws(function () { new Rundeck({}); }, /Required option serverUrl not set/);
+    it('should throw an error when no port specified', function () {
+      assert.throws(function () { new Rundeck({
+        host: 'http://example.com'
+      }); }, /Required option port not set/);
     });
 
     it('should throw an error when no apiVersion specified', function () {
       assert.throws(function () { new Rundeck({
-        serverUrl: 'http://example.com'
+        host: 'http://example.com',
+        port: 4000
       }); }, /Required option apiVersion not set/);
     });
 
     it('should throw an error when no authToken specified', function () {
       assert.throws(function () { new Rundeck({
-        serverUrl: 'http://example.com',
+        host: 'http://example.com',
+        port: 4000,
         apiVersion: 13
       }); }, /Required option authToken not set/);
     });
@@ -31,12 +35,13 @@ describe('Rundeck', function () {
       var rundeck;
       assert.doesNotThrow(function () {
         rundeck = new Rundeck({
-          serverUrl: 'http://example.com',
+          host: 'http://example.com',
+          port: 4000,
           apiVersion: 13,
           authToken: 'token'
         });
       });
-      assert(rundeck.serverUrl, 'Missing rundeck.serverUrl object');
+      assert(rundeck.host, 'Missing rundeck.host object');
     });
   });
 
@@ -56,23 +61,24 @@ describe('Rundeck', function () {
     }
 
     it('should log the execute job GET request', function (done) {
-      nock('http://localhost:4440', requestHeaders())
+      nock('http://example.com:4000', requestHeaders())
         .get('/api/13/job/1234/run')
         .reply(200, fs.readFileSync('./src/test/data/job-run.xml', 'ascii'));
 
-      nock('http://localhost:4440', requestHeaders())
+      nock('http://example.com:4000', requestHeaders())
         .get('/api/13/execution/1')
         .reply(200, fs.readFileSync('./src/test/data/job-done.xml', 'ascii'));
 
       var rundeck = new Rundeck({
-        serverUrl: 'http://localhost:4440',
+        host: 'http://example.com',
+        port: 4000,
         apiVersion: 13,
         authToken: 'token'
       });
 
       rundeck.executeJob('1234', done);
 
-      assert(console.log.calledWith('GET: http://localhost:4440/api/13/job/1234/run'));
+      assert(console.log.calledWith('GET: http://example.com:4000/api/13/job/1234/run'));
       done();
     });
   });

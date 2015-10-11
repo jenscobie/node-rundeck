@@ -1,0 +1,41 @@
+#! /usr/bin/env node
+
+var fs = require('fs');
+var program = require('commander');
+var Rundeck = require('../src/rundeck');
+
+program.name = 'rundeck';
+
+program
+  .version(JSON.parse(fs.readFileSync(__dirname + '/../package.json', 'utf8')).version)
+  .option('--host <host>', 'Specify the host [http://localhost]', 'http://localhost')
+  .option('--port <port>', 'Specify the port [4440]', 4440)
+  .option('--api-version <version>', 'Specify the API version [13]', 13)
+  .option('--auth-token <token>', 'Specify the Authentication Token [token]', 'token');
+
+program
+  .command('run <id>', 'Execute a Rundeck job')
+  .action(function(id) {
+    
+    var rundeck = new Rundeck({
+      host: program.host,
+      port: program.port,
+      apiVersion: program.apiVersion,
+      authToken: program.authToken
+    });
+
+    rundeck.executeJob(id, function(err) {
+      if (err) {
+        console.log(err.message);
+        process.exit(1);
+      }
+      process.exit(0);
+    });
+  });
+
+program.parse(process.argv);
+
+rundeck.host(program.host);
+rundeck.port(program.port);
+rundeck.apiVersion(program.apiVersion);
+rundeck.authToken(program.authToken);

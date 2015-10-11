@@ -6,17 +6,51 @@ var xml2js = require('xml2js').parseString;
 var Job = require('./lib/job');
 
 function Rundeck(options) {
-  if (!options) { throw new Error('No options set'); }
-  if (!options.serverUrl) { throw new Error('Required option serverUrl not set') }
+  options = options || {};
+  this.options = options;
+
+  if (!options.host) { throw new Error('Required option host not set') }
+  if (!options.port) { throw new Error('Required option port not set') }
   if (!options.apiVersion) { throw new Error('Required option apiVersion not set') }
   if (!options.authToken) { throw new Error('Required option authToken not set') }
 
-  this.serverUrl = options.serverUrl;
-  this.apiVersion = options.apiVersion;
-  this.authToken = options.authToken;
+  this.host(options.host);
+  this.port(options.port);
+  this.apiVersion(options.apiVersion || 13);
+  this.authToken(options.authToken);
 }
 
+Rundeck.prototype.host = function(host) {
+  if (host !== undefined) {
+    this.options.host = host;
+  }
+  return this;
+};
+
+Rundeck.prototype.port = function(port) {
+  if (port !== undefined) {
+    this.options.port = port;
+  }
+  return this;
+};
+
+Rundeck.prototype.apiVersion = function(version) {
+  if (version !== undefined) {
+    this.options.apiVersion = version;
+  }
+  return this;
+};
+
+Rundeck.prototype.authToken = function(token) {
+  if (token !== undefined) {
+    this.options.authToken = token;
+  }
+  return this;
+};
+
 Rundeck.prototype.executeJob = function(jobId, done) {
-  var job = new Job(this.serverUrl, this.apiVersion, this.authToken, jobId);
+  var serverUrl = this.options.host + ':' + this.options.port;
+  var job = new Job(serverUrl, this.options.apiVersion, this.options.authToken, jobId);
   job.execute(done);
+  return this;
 }
