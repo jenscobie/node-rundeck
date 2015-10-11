@@ -16,7 +16,7 @@ program
 program
   .command('run <id>', 'Execute a Rundeck job')
   .action(function(id) {
-    
+
     var rundeck = new Rundeck({
       host: program.host,
       port: program.port,
@@ -34,8 +34,3 @@ program
   });
 
 program.parse(process.argv);
-
-rundeck.host(program.host);
-rundeck.port(program.port);
-rundeck.apiVersion(program.apiVersion);
-rundeck.authToken(program.authToken);
