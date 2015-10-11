@@ -27,7 +27,7 @@ function start_rundeck {
   echo "Rundeck URL: $SERVER_URL"
 }
 
-function coverage {
+function test_coverage {
    npm run-script test-cov
 }
 
@@ -38,6 +38,8 @@ function unit_test {
 [[ $@ ]] || { help_text; exit 1; }
 
 case "$1" in
+    coverage) test_coverage
+    ;;
     run) start_rundeck
     ;;
     test) unit_test

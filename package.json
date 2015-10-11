@@ -13,6 +13,10 @@
     "url": "https://github.com/jenscobie/node-rundeck/issues"
   },
   "homepage": "https://github.com/jenscobie/node-rundeck#readme",
+  "dependencies": {
+    "request": "^2.64.0",
+    "xml2js": "^0.4.12"
+  },
   "devDependencies": {
     "eslint": "^1.6.0",
     "istanbul": "^0.3.22",
@@ -25,9 +29,5 @@
     "lint": "node_modules/eslint/bin/eslint.js src/",
     "test": "node_modules/mocha/bin/mocha --bail --reporter spec --recursive src/test/",
     "test-cov": "istanbul cover node_modules/mocha/bin/_mocha -- --reporter dot --recursive src/test/"
-  },
-  "dependencies": {
-    "request": "^2.64.0",
-    "xml2js": "^0.4.12"
   }
 }
