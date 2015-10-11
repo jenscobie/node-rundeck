@@ -79,7 +79,6 @@ Job.prototype.execute = function(done) {
         return done(new Error("rundeck execution failed: " + JSON.stringify(executionInfo)));
       }
 
-      console.log('status: ' + executionInfo.$.status);
       return done(null, executionInfo);
     });
   };
