@@ -57,7 +57,6 @@ Job.prototype.execute = function(done) {
       }
 
       var executionInfo = body.executions.execution[0];
-      console.log("Execution created: " + executionInfo.$.href);
       return done(null, executionInfo, serverUrl, apiVersion, authToken);
     });
   };
@@ -68,6 +67,7 @@ Job.prototype.execute = function(done) {
     };
 
     var executionStatusUrl = url(serverUrl, apiVersion, executionId);
+    console.log('GET: ' + executionStatusUrl);
     get(executionStatusUrl, authToken, function(err, body) {
       if(err) {
         return done(err);
@@ -75,8 +75,11 @@ Job.prototype.execute = function(done) {
 
       var executionInfo = body.executions.execution[0];
 
-      if(executionInfo.$.status === "failed"){
-        return done(new Error("rundeck execution failed: " + JSON.stringify(executionInfo)));
+      if(executionInfo.$.status === "failed") {
+        var message = util.format("Execution failed: %s", executionInfo.$.href);
+        console.log(message);
+        console.log(JSON.stringify(executionInfo));
+        return done(new Error(message));
       }
 
       return done(null, executionInfo);

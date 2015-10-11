@@ -1,7 +1,7 @@
 var assert = require('assert');
 var fs = require('fs');
 var nock = require('nock');
-var sinon = require('mocha-sinon');
+var sinon = require('sinon');
 var Rundeck = require('../rundeck');
 
 describe('Rundeck', function () {
@@ -46,10 +46,15 @@ describe('Rundeck', function () {
   });
 
   describe('Job Execution', function () {
+    var sandbox;
 
     beforeEach(function() {
-      this.sinon.stub(console, 'log');
+      sandbox = sinon.sandbox.create();
     });
+
+    afterEach(function() {
+      sandbox.restore();
+    })
 
     var requestHeaders = function() {
       return {
@@ -61,6 +66,8 @@ describe('Rundeck', function () {
     }
 
     it('should log the execute job GET request', function (done) {
+      sandbox.stub(console, 'log');
+
       nock('http://example.com:4000', requestHeaders())
         .get('/api/13/job/1234/run')
         .reply(200, fs.readFileSync('./src/test/data/job-run.xml', 'ascii'));
@@ -79,7 +86,7 @@ describe('Rundeck', function () {
       rundeck.executeJob('1234', done);
 
       assert(console.log.calledWith('GET: http://example.com:4000/api/13/job/1234/run'));
-      done();
+      assert(console.log.calledWith('GET: http://example.com:4000/api/13/execution/1'));
     });
   });
 });
