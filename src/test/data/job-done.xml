@@ -1,0 +1,18 @@
+<executions count='1'>
+    <execution id='1' href='http://localhost:4440/execution/follow/1' status='succeeded' project='Project'>
+        <user>admin</user>
+        <date-started unixtime='1444515964000'>2015-10-10T22:26:04Z</date-started>
+        <date-ended unixtime='1444515966000'>2015-10-10T22:26:06Z</date-ended>
+        <job id='1234' averageDuration='1953'>
+            <name>Job</name>
+            <group></group>
+            <project>Project</project>
+            <description></description>
+        </job>
+        <description>ls -l</description>
+        <argstring />
+        <successfulNodes>
+            <node name='localhost' />
+        </successfulNodes>
+    </execution>
+</executions>

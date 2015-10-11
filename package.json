@@ -1,0 +1,33 @@
+{
+  "name": "node-rundeck",
+  "version": "1.0.0",
+  "description": "An incomplete implementation of a Rundeck API client",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jenscobie/node-rundeck.git"
+  },
+  "author": "Jen Scobie <jenscobie@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jenscobie/node-rundeck/issues"
+  },
+  "homepage": "https://github.com/jenscobie/node-rundeck#readme",
+  "devDependencies": {
+    "eslint": "^1.6.0",
+    "istanbul": "^0.3.22",
+    "mocha": "^2.3.3",
+    "mocha-sinon": "^1.1.4",
+    "nock": "^2.15.0",
+    "sinon": "^1.17.1"
+  },
+  "scripts": {
+    "lint": "node_modules/eslint/bin/eslint.js src/",
+    "test": "node_modules/mocha/bin/mocha --bail --reporter spec --recursive src/test/",
+    "test-cov": "istanbul cover node_modules/mocha/bin/_mocha -- --reporter dot --recursive src/test/"
+  },
+  "dependencies": {
+    "request": "^2.64.0",
+    "xml2js": "^0.4.12"
+  }
+}
