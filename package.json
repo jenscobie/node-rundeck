@@ -1,6 +1,6 @@
 {
   "name": "rundeck",
-  "version": "1.0.36",
+  "version": "1.0.37",
   "description": "An incomplete implementation of a Rundeck API client",
   "main": "./index",
   "bin": {
@@ -18,11 +18,11 @@
   },
   "homepage": "https://github.com/jenscobie/node-rundeck#readme",
   "dependencies": {
+    "commander": "^2.8.1",
     "request": "^2.64.0",
     "xml2js": "^0.4.12"
   },
   "devDependencies": {
-    "commander": "^2.8.1",
     "eslint": "^1.6.0",
     "istanbul": "^0.3.22",
     "mocha": "^2.3.3",
