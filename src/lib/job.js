@@ -67,7 +67,6 @@ Job.prototype.execute = function(done) {
     };
 
     var executionStatusUrl = url(serverUrl, apiVersion, executionId);
-    console.log('GET: ' + executionStatusUrl);
     get(executionStatusUrl, authToken, function(err, body) {
       if(err) {
         return done(err);
@@ -105,7 +104,7 @@ Job.prototype.execute = function(done) {
           }
 
           status = response.$.status;
-          setTimeout(next, 2);
+          setTimeout(next, 10000);
         });
       },
       function(err) {

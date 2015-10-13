@@ -86,7 +86,6 @@ describe('Rundeck', function () {
       rundeck.executeJob('1234', done);
 
       assert(console.log.calledWith('GET: http://example.com:4000/api/13/job/1234/run'));
-      assert(console.log.calledWith('GET: http://example.com:4000/api/13/execution/1'));
     });
   });
 });

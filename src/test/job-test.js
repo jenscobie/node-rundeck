@@ -1,5 +1,4 @@
 var assert = require('assert');
-var stdout = require("test-console").stdout;
 var Job = require('../lib/job');
 
 describe('Job', function () {
