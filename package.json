@@ -29,6 +29,7 @@
     "mocha": "^2.3.3",
     "mocha-sinon": "^1.1.4",
     "nock": "^2.15.0",
+    "nodeunit": "^0.9.1",
     "sinon": "^1.17.1"
   },
   "scripts": {
