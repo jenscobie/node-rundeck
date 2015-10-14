@@ -34,10 +34,13 @@ describe('Rundeck Gateway', function () {
       done();
     });
 
-    it('should return payload on job execution', function(done) {
+    it('should return json payload on job execution', function(done) {
       execute('http://example.com', 4000, 13, token, id, function (err, result) {
         assert(request.get.called);
-        assert.equal(result, payload)
+        var execution = result.executions.execution[0];
+        assert.equal(execution.$.id, 1);
+        assert.equal(execution.$.href, 'http://example.com:4000/execution/follow/1');
+        assert.equal(execution.$.status, 'running');
         done();
       });
     });
