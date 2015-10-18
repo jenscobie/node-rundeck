@@ -1,19 +1,22 @@
-var assert = require('assert');
+var chai = require("chai");
+var expect = require("chai").expect;
 var fs = require('fs');
 var request = require('request');
-var nodeunit = require('nodeunit');
 var sinon = require('sinon');
+var sinonChai = require("sinon-chai");
 var util = require('util');
 var execute = require('../lib/rundeck-job-gateway');
+chai.use(sinonChai);
 
 describe('Rundeck Gateway', function () {
-  describe('Rundeck API is available', function () {
+  describe('GET /api/13/job/id/run', function () {
 
     var token = 'token';
     var id = 1;
     var payload = fs.readFileSync('./src/test/data/job-run.xml', 'ascii');
 
-    before(function(done) {
+    function stubSuccessfulRequest() {
+      sinon.stub(console, 'log');
       sinon
         .stub(request, 'get')
         .withArgs({
@@ -26,32 +29,10 @@ describe('Rundeck Gateway', function () {
         .yields(null,
           { statusCode: 200 },
           payload);
-      done();
-    });
+    }
 
-    after(function(done) {
-      request.get.restore();
-      done();
-    });
-
-    it('should return json payload on job execution', function(done) {
-      execute('http://example.com', 4000, 13, token, id, function (err, result) {
-        assert(request.get.called);
-        var execution = result.executions.execution[0];
-        assert.equal(execution.$.id, 1);
-        assert.equal(execution.$.href, 'http://example.com:4000/execution/follow/1');
-        assert.equal(execution.$.status, 'running');
-        done();
-      });
-    });
-  });
-
-  describe('Rundeck API is down', function () {
-
-    var token = 'token';
-    var id = 1;
-
-    before(function(done) {
+    function stubFailedRequest() {
+      sinon.stub(console, 'error');
       sinon
         .stub(request, 'get')
         .withArgs({
@@ -62,21 +43,61 @@ describe('Rundeck Gateway', function () {
           }
         }, sinon.match.any)
         .yields(null,
-          { statusCode: 200 },
-          fs.readFileSync('./src/test/data/job-run.xml', 'ascii'));
-      done();
-    });
+          { statusCode: 500 },
+          null);
+    }
 
-    after(function(done) {
-      request.get.restore();
-      done();
-    });
+    it('should log on success', function(done) {
+      stubSuccessfulRequest();
+      execute('http://example.com', 4000, 13, token, id, function(err, result) {
 
-    it('should return error on job execution failure', function(done) {
-      execute('http://example.com', 4000, 13, token, id, function (err, result) {
-        assert.ifError(err);
+        expect(console.log).to.have.been
+          .calledWith("GET http://example.com:4000/api/13/job/1/run returned 200 OK");
+
+        request.get.restore();
+        console.log.restore();
         done();
       });
     });
-  })
+
+    it('should log error on failure', function(done) {
+      stubFailedRequest();
+      execute('http://example.com', 4000, 13, token, id, function(err, result) {
+        expect(console.error).to.have.been
+          .calledWith("GET http://example.com:4000/api/13/job/1/run returned 500");
+
+        request.get.restore();
+        console.error.restore();
+        done();
+      });
+    });
+
+    it('should return json payload', function(done) {
+      stubSuccessfulRequest();
+      execute('http://example.com', 4000, 13, token, id, function (err, result) {
+        expect(request.get).to.have.been.called;
+
+        var execution = result.executions.execution[0];
+        expect(execution.$.id).to.equal('1');
+        expect(execution.$.href).to.equal('http://example.com:4000/execution/follow/1');
+        expect(execution.$.status).to.equal('running');
+
+        request.get.restore();
+        console.log.restore();
+        done();
+      });
+    });
+
+    it('should return error on failure', function(done) {
+      stubFailedRequest();
+      var spy = sinon.spy();
+
+      execute('http://example.com', 4000, 13, token, id, spy);
+      expect(spy).to.have.been.calledWith(new Error("Failed to execute job '1'"));
+
+      request.get.restore();
+      console.error.restore();
+      done();
+    });
+  });
 });
