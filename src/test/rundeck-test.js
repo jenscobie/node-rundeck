@@ -1,6 +1,5 @@
 var assert = require('assert');
 var fs = require('fs');
-var nock = require('nock');
 var sinon = require('sinon');
 var Rundeck = require('../rundeck');
 
@@ -42,50 +41,6 @@ describe('Rundeck', function () {
         });
       });
       assert(rundeck.host, 'Missing rundeck.host object');
-    });
-  });
-
-  describe('Job Execution', function () {
-    var sandbox;
-
-    beforeEach(function() {
-      sandbox = sinon.sandbox.create();
-    });
-
-    afterEach(function() {
-      sandbox.restore();
-    })
-
-    var requestHeaders = function() {
-      return {
-          reqheaders: {
-            'User-Agent': 'node-rundeck',
-            'X-Rundeck-Auth-Token': 'token'
-          }
-        }
-    }
-
-    it('should log the execute job GET request', function (done) {
-      sandbox.stub(console, 'log');
-
-      nock('http://example.com:4000', requestHeaders())
-        .get('/api/13/job/1234/run')
-        .reply(200, fs.readFileSync('./src/test/data/job-run.xml', 'ascii'));
-
-      nock('http://example.com:4000', requestHeaders())
-        .get('/api/13/execution/1')
-        .reply(200, fs.readFileSync('./src/test/data/job-done.xml', 'ascii'));
-
-      var rundeck = new Rundeck({
-        host: 'http://example.com',
-        port: 4000,
-        apiVersion: 13,
-        authToken: 'token'
-      });
-
-      rundeck.executeJob('1234', done);
-
-      assert(console.log.calledWith('GET: http://example.com:4000/api/13/job/1234/run'));
     });
   });
 });
