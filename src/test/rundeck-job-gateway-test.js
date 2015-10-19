@@ -27,12 +27,16 @@ describe('Rundeck Gateway', function () {
           }
         }, sinon.match.any)
         .yields(null,
-          { statusCode: 200 },
+          {
+            statusCode: 200,
+            statusMessage: 'OK',
+            href: 'http://example.com:4000/api/13/job/1/run'
+          },
           payload);
     }
 
     function stubFailedRequest() {
-      sinon.stub(console, 'error');
+      sinon.stub(console, 'log');
       sinon
         .stub(request, 'get')
         .withArgs({
@@ -43,11 +47,15 @@ describe('Rundeck Gateway', function () {
           }
         }, sinon.match.any)
         .yields(null,
-          { statusCode: 500 },
+          {
+            statusCode: 500,
+            statusMessage: 'Internal Server Error',
+            href: 'http://example.com:4000/api/13/job/1/run'
+          },
           null);
     }
 
-    it('should log on success', function(done) {
+    it('should log response', function(done) {
       stubSuccessfulRequest();
       execute('http://example.com', 4000, 13, token, id, function(err, result) {
 
@@ -56,18 +64,6 @@ describe('Rundeck Gateway', function () {
 
         request.get.restore();
         console.log.restore();
-        done();
-      });
-    });
-
-    it('should log error on failure', function(done) {
-      stubFailedRequest();
-      execute('http://example.com', 4000, 13, token, id, function(err, result) {
-        expect(console.error).to.have.been
-          .calledWith("GET http://example.com:4000/api/13/job/1/run returned 500");
-
-        request.get.restore();
-        console.error.restore();
         done();
       });
     });
@@ -96,7 +92,7 @@ describe('Rundeck Gateway', function () {
       expect(spy).to.have.been.calledWith(new Error("Failed to execute job '1'"));
 
       request.get.restore();
-      console.error.restore();
+      console.log.restore();
       done();
     });
   });

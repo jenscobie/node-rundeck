@@ -16,18 +16,22 @@ function options(url, authToken) {
   };
 };
 
+function logResponse(response) {
+  var entry = util.format("GET %s returned %d %s",
+    response.href,
+    response.statusCode,
+    response.statusMessage);
+  console.log(entry);
+}
+
 function execute(host, port, apiVersion, authToken, id, callback) {
   var url = executeJobUrl(host, port, apiVersion, id)
-  request.get(options(url, authToken), function(err, response, body) {
+  request.get(options(url, authToken), function getResponse(err, response, body) {
     if (err) return callback(err);
+    logResponse(response);
     if (response.statusCode != 200) {
-      var message = util.format("Failed to execute job '%s'", id);
-      console.error(util.format("GET %s returned %d",
-        executeJobUrl(host, port, apiVersion, id), response.statusCode));
-      callback(new Error(message));
+      callback(new Error(util.format("Failed to execute job '%s'", id)));
     } else {
-      console.log(util.format("GET %s returned 200 OK",
-        executeJobUrl(host, port, apiVersion, id)));
       xml2js(body, function(err, response) {
         callback(null, response);
       });
