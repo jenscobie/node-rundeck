@@ -18,7 +18,7 @@ function options(url, authToken) {
 
 function logResponse(response) {
   var entry = util.format("GET %s returned %d %s",
-    response.href,
+    response.request.href,
     response.statusCode,
     response.statusMessage);
   console.log(entry);

@@ -18,10 +18,15 @@ function options(url, authToken) {
 
 function logResponse(response) {
   var entry = util.format("GET %s returned %d %s",
-    response.href,
+    response.request.href,
     response.statusCode,
     response.statusMessage);
   console.error(entry);
+}
+
+function getStatus(response) {
+  var execution = response.executions.execution[0]
+  return execution.$.status;
 }
 
 function get(host, port, apiVersion, authToken, id, callback) {
@@ -33,6 +38,12 @@ function get(host, port, apiVersion, authToken, id, callback) {
       callback(new Error(util.format("Failed to get execution '%s'", id)));
     } else {
       xml2js(body, function(err, response) {
+        if (getStatus(response) === 'failed') {
+          return callback(new Error(util.format("Execution of job '%s' failed", id)));
+        }
+        if (getStatus(response) === 'succeeded') {
+          console.log(util.format("Execution '%s' succeeded", id));
+        }
         callback(null, response);
       });
     }

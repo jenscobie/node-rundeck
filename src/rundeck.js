@@ -3,7 +3,7 @@ exports = module.exports = Rundeck;
 var request = require('request');
 var async = require('async');
 var xml2js = require('xml2js').parseString;
-var Job = require('./lib/job');
+var run = require('./lib/job');
 
 function Rundeck(options) {
   options = options || {};
@@ -49,8 +49,11 @@ Rundeck.prototype.authToken = function(token) {
 };
 
 Rundeck.prototype.executeJob = function(jobId, done) {
-  var serverUrl = this.options.host + ':' + this.options.port;
-  var job = new Job(serverUrl, this.options.apiVersion, this.options.authToken, jobId);
-  job.execute(done);
+  run(this.options.host,
+    this.options.port,
+    this.options.apiVersion,
+    this.options.authToken,
+    jobId,
+    done);
   return this;
 }

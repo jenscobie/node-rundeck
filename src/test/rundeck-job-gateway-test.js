@@ -16,7 +16,6 @@ describe('Rundeck Job Gateway', function () {
     var payload = fs.readFileSync('./src/test/data/job-run.xml', 'ascii');
 
     function stubSuccessfulRequest() {
-      sinon.stub(console, 'log');
       sinon
         .stub(request, 'get')
         .withArgs({
@@ -30,13 +29,14 @@ describe('Rundeck Job Gateway', function () {
           {
             statusCode: 200,
             statusMessage: 'OK',
-            href: 'http://example.com:4000/api/13/job/1/run'
+            request: {
+              href: 'http://example.com:4000/api/13/job/1/run'
+            }
           },
           payload);
     }
 
     function stubFailedRequest() {
-      sinon.stub(console, 'log');
       sinon
         .stub(request, 'get')
         .withArgs({
@@ -50,13 +50,17 @@ describe('Rundeck Job Gateway', function () {
           {
             statusCode: 500,
             statusMessage: 'Internal Server Error',
-            href: 'http://example.com:4000/api/13/job/1/run'
+            request: {
+              href: 'http://example.com:4000/api/13/job/1/run'
+            }
           },
           null);
     }
 
     it('should log response', function(done) {
+      sinon.stub(console, 'log');
       stubSuccessfulRequest();
+
       execute('http://example.com', 4000, 13, token, id, function(err, result) {
 
         expect(console.log).to.have.been
@@ -69,7 +73,9 @@ describe('Rundeck Job Gateway', function () {
     });
 
     it('should return json payload', function(done) {
+      sinon.stub(console, 'log');
       stubSuccessfulRequest();
+
       execute('http://example.com', 4000, 13, token, id, function (err, result) {
         expect(request.get).to.have.been.called;
 
@@ -85,6 +91,7 @@ describe('Rundeck Job Gateway', function () {
     });
 
     it('should return error on failure', function(done) {
+      sinon.stub(console, 'log');
       stubFailedRequest();
       var spy = sinon.spy();
 
