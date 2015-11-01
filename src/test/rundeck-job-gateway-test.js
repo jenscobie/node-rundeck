@@ -93,16 +93,18 @@ describe('Rundeck Job Gateway', function () {
 
     it('should return error when client sends a bad request', function(done) {
       sinon.stub(console, 'error');
+      sinon.stub(console, 'log');
       stubFailedRequest();
       var spy = sinon.spy();
 
+      var message = "Execution '1' failed. Job options were not valid: Option 'argument' is required.";
       execute('http://example.com', 4000, 13, token, id, spy);
-      expect(console.error).to.have.been
-        .calledWith("Execution '1' failed. Job options were not valid: Option 'argument' is required.");
-      expect(spy).to.have.been.calledWith(new Error("Execution '1' failed."));
+      expect(console.error).to.have.been.calledWith(message);
+      expect(spy).to.have.been.calledWith(new Error(message));
 
       request.get.restore();
       console.error.restore();
+      console.log.restore();
       done();
     });
   });
