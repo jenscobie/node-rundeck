@@ -25,10 +25,7 @@ program
     });
 
     rundeck.executeJob(id, function(err) {
-      if (err) {
-        console.log(err.message);
-        process.exit(1);
-      }
+      if (err) process.exit(1);
       process.exit(0);
     });
   });

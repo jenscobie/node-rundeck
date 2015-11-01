@@ -14,6 +14,7 @@ describe('Rundeck Job Gateway', function () {
     var token = 'token';
     var id = 1;
     var payload = fs.readFileSync('./src/test/data/job-run.xml', 'ascii');
+    var badRequestPayload = fs.readFileSync('./src/test/data/job-error.xml', 'ascii');
 
     function stubSuccessfulRequest() {
       sinon
@@ -48,13 +49,13 @@ describe('Rundeck Job Gateway', function () {
         }, sinon.match.any)
         .yields(null,
           {
-            statusCode: 500,
-            statusMessage: 'Internal Server Error',
+            statusCode: 400,
+            statusMessage: 'Bad Request',
             request: {
               href: 'http://example.com:4000/api/13/job/1/run'
             }
           },
-          null);
+          badRequestPayload);
     }
 
     it('should log response', function(done) {
@@ -90,16 +91,18 @@ describe('Rundeck Job Gateway', function () {
       });
     });
 
-    it('should return error on failure', function(done) {
-      sinon.stub(console, 'log');
+    it('should return error when client sends a bad request', function(done) {
+      sinon.stub(console, 'error');
       stubFailedRequest();
       var spy = sinon.spy();
 
       execute('http://example.com', 4000, 13, token, id, spy);
-      expect(spy).to.have.been.calledWith(new Error("Failed to execute job '1'"));
+      expect(console.error).to.have.been
+        .calledWith("Execution '1' failed. Job options were not valid: Option 'argument' is required.");
+      expect(spy).to.have.been.calledWith(new Error("Execution '1' failed."));
 
       request.get.restore();
-      console.log.restore();
+      console.error.restore();
       done();
     });
   });

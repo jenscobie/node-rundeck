@@ -1,0 +1,5 @@
+<result error='true' apiversion='13'>
+    <error code='api.error.job.options-invalid'>
+        <message>Job options were not valid: Option 'argument' is required.</message>
+    </error>
+</result>

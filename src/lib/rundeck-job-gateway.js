@@ -30,13 +30,25 @@ function execute(host, port, apiVersion, authToken, id, callback) {
     if (err) return callback(err);
     logResponse(response);
     if (response.statusCode != 200) {
-      callback(new Error(util.format("Failed to execute job '%s'", id)));
+      callback(new Error(processErrors(response, body, id)));
     } else {
       xml2js(body, function(err, response) {
         callback(null, response);
       });
     }
   });
+}
+
+function processErrors(response, body, id) {
+  xml2js(body, function(err, response) {
+    var message = util.format("Execution '%s' failed. %s", id, errorMessage(response));
+    console.error(message);
+    return message;
+  });
+}
+
+function errorMessage(response) {
+  return response.result.error[0].message[0];
 }
 
 module.exports = execute;
