@@ -6,27 +6,23 @@ function executeJobUrl(host, port, apiVersion, id) {
   return util.format("%s:%s/api/%d/job/%s/run", host, port, apiVersion, id);
 }
 
-function options(url, authToken) {
+function optionsWith(url, authToken, arguments) {
   return {
     url: url,
     headers: {
       'User-Agent': 'node-rundeck',
       'X-Rundeck-Auth-Token': authToken
+    },
+    body: {
+      'argString': arguments
     }
   };
 };
 
-function logResponse(response) {
-  var entry = util.format("GET %s returned %d %s",
-    response.request.href,
-    response.statusCode,
-    response.statusMessage);
-  console.log(entry);
-}
-
-function execute(host, port, apiVersion, authToken, id, callback) {
+function execute(host, port, apiVersion, authToken, id, arguments, callback) {
   var url = executeJobUrl(host, port, apiVersion, id)
-  request.get(options(url, authToken), function getResponse(err, response, body) {
+  var options = optionsWith(url, authToken, arguments);
+  request.post(options, function getResponse(err, response, body) {
     if (err) return callback(err);
     logResponse(response);
     if (response.statusCode != 200) {
@@ -37,6 +33,14 @@ function execute(host, port, apiVersion, authToken, id, callback) {
       });
     }
   });
+}
+
+function logResponse(response) {
+  var entry = util.format("POST %s returned %d %s",
+    response.request.href,
+    response.statusCode,
+    response.statusMessage);
+  console.log(entry);
 }
 
 function processErrors(response, body, id) {

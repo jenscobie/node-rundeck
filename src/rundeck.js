@@ -48,12 +48,13 @@ Rundeck.prototype.authToken = function(token) {
   return this;
 };
 
-Rundeck.prototype.executeJob = function(jobId, done) {
+Rundeck.prototype.executeJob = function(id, arguments, done) {
   run(this.options.host,
     this.options.port,
     this.options.apiVersion,
     this.options.authToken,
-    jobId,
+    id,
+    arguments,
     done);
   return this;
 }

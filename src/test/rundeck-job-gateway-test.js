@@ -9,7 +9,7 @@ var execute = require('../lib/rundeck-job-gateway');
 chai.use(sinonChai);
 
 describe('Rundeck Job Gateway', function () {
-  describe('GET /api/13/job/id/run', function () {
+  describe('POST /api/13/job/id/run', function () {
 
     var token = 'token';
     var id = 1;
@@ -18,12 +18,15 @@ describe('Rundeck Job Gateway', function () {
 
     function stubSuccessfulRequest() {
       sinon
-        .stub(request, 'get')
+        .stub(request, 'post')
         .withArgs({
           url: util.format("http://example.com:4000/api/13/job/%s/run", id),
           headers: {
             'User-Agent': 'node-rundeck',
             'X-Rundeck-Auth-Token': token
+          },
+          body: {
+            'argString': '-argument value'
           }
         }, sinon.match.any)
         .yields(null,
@@ -39,12 +42,15 @@ describe('Rundeck Job Gateway', function () {
 
     function stubFailedRequest() {
       sinon
-        .stub(request, 'get')
+        .stub(request, 'post')
         .withArgs({
           url: util.format("http://example.com:4000/api/13/job/%s/run", id),
           headers: {
             'User-Agent': 'node-rundeck',
             'X-Rundeck-Auth-Token': token
+          },
+          body: {
+            'argString': '-argument value'
           }
         }, sinon.match.any)
         .yields(null,
@@ -62,12 +68,11 @@ describe('Rundeck Job Gateway', function () {
       sinon.stub(console, 'log');
       stubSuccessfulRequest();
 
-      execute('http://example.com', 4000, 13, token, id, function(err, result) {
-
+      execute('http://example.com', 4000, 13, token, id, '-argument value', function(err, result) {
         expect(console.log).to.have.been
-          .calledWith("GET http://example.com:4000/api/13/job/1/run returned 200 OK");
+          .calledWith("POST http://example.com:4000/api/13/job/1/run returned 200 OK");
 
-        request.get.restore();
+        request.post.restore();
         console.log.restore();
         done();
       });
@@ -77,15 +82,16 @@ describe('Rundeck Job Gateway', function () {
       sinon.stub(console, 'log');
       stubSuccessfulRequest();
 
-      execute('http://example.com', 4000, 13, token, id, function (err, result) {
-        expect(request.get).to.have.been.called;
+      execute('http://example.com', 4000, 13, token, id, '-argument value', function (err, result) {
+        expect(request.post).to.have.been.called;
 
         var execution = result.executions.execution[0];
         expect(execution.$.id).to.equal('1');
         expect(execution.$.href).to.equal('http://example.com:4000/execution/follow/1');
         expect(execution.$.status).to.equal('running');
+        expect(execution.argstring[0]).to.equal('-argument value');
 
-        request.get.restore();
+        request.post.restore();
         console.log.restore();
         done();
       });
@@ -98,11 +104,11 @@ describe('Rundeck Job Gateway', function () {
       var spy = sinon.spy();
 
       var message = "Execution '1' failed. Job options were not valid: Option 'argument' is required.";
-      execute('http://example.com', 4000, 13, token, id, spy);
+      execute('http://example.com', 4000, 13, token, id, '-argument value', spy);
       expect(console.error).to.have.been.calledWith(message);
       expect(spy).to.have.been.calledWith(new Error(message));
 
-      request.get.restore();
+      request.post.restore();
       console.error.restore();
       console.log.restore();
       done();

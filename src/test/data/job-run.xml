@@ -9,6 +9,6 @@
             <description></description>
         </job>
         <description>ls -l</description>
-        <argstring />
+        <argstring>-argument value</argstring>
     </execution>
 </executions>

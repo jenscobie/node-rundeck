@@ -5,7 +5,7 @@ var xml2js = require('xml2js').parseString;
 var execute = require('../lib/rundeck-job-gateway');
 var get = require('../lib/rundeck-execution-gateway');
 
-function run(host, port, apiVersion, authToken, id, done) {
+function run(host, port, apiVersion, authToken, id, arguments, done) {
 
   function getExecutionId(response) {
     var execution = response.executions.execution[0]
@@ -24,7 +24,7 @@ function run(host, port, apiVersion, authToken, id, done) {
     });
   }
 
-  execute(host, port, apiVersion, authToken, id, function(err, response) {
+  execute(host, port, apiVersion, authToken, id, arguments, function(err, response) {
     if (err) return done(err);
 
     var executionId = getExecutionId(response);

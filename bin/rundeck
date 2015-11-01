@@ -14,8 +14,8 @@ program
   .option('--auth-token <token>', 'Specify the Authentication Token [token]', 'token');
 
 program
-  .command('run <id>', 'Execute a Rundeck job')
-  .action(function(id) {
+  .command('run <id> [args]', 'Execute a Rundeck job')
+  .action(function(id, args) {
 
     var rundeck = new Rundeck({
       host: program.host,
@@ -24,7 +24,7 @@ program
       authToken: program.authToken
     });
 
-    rundeck.executeJob(id, function(err) {
+    rundeck.executeJob(id, args, function(err) {
       if (err) process.exit(1);
       process.exit(0);
     });
