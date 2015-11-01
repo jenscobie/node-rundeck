@@ -13,9 +13,9 @@ function optionsWith(url, authToken, arguments) {
       'User-Agent': 'node-rundeck',
       'X-Rundeck-Auth-Token': authToken
     },
-    body: {
+    body: JSON.stringify({
       'argString': arguments
-    }
+    })
   };
 };
 
@@ -23,7 +23,10 @@ function execute(host, port, apiVersion, authToken, id, arguments, callback) {
   var url = executeJobUrl(host, port, apiVersion, id)
   var options = optionsWith(url, authToken, arguments);
   request.post(options, function getResponse(err, response, body) {
-    if (err) return callback(err);
+    if (err) {
+      console.error(err.message);
+      return callback(err);
+    }
     logResponse(response);
     if (response.statusCode != 200) {
       callback(new Error(processErrors(response, body, id)));
