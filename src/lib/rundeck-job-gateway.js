@@ -1,27 +1,27 @@
 var request = require('request');
+var query = require("querystring");
 var util = require('util');
 var xml2js = require('xml2js').parseString;
 
-function executeJobUrl(host, port, apiVersion, id) {
-  return util.format("%s:%s/api/%d/job/%s/run", host, port, apiVersion, id);
+function executeJobUrl(host, port, apiVersion, id, arguments) {
+  var queryString = query.stringify({argString: arguments});
+  return util.format("%s:%s/api/%d/job/%s/run?%s",
+    host, port, apiVersion, id, queryString);
 }
 
-function optionsWith(url, authToken, arguments) {
+function optionsWith(url, authToken) {
   return {
     url: url,
     headers: {
       'User-Agent': 'node-rundeck',
       'X-Rundeck-Auth-Token': authToken
-    },
-    body: JSON.stringify({
-      'argString': arguments
-    })
+    }
   };
 };
 
 function execute(host, port, apiVersion, authToken, id, arguments, callback) {
-  var url = executeJobUrl(host, port, apiVersion, id)
-  var options = optionsWith(url, authToken, arguments);
+  var url = executeJobUrl(host, port, apiVersion, id, arguments)
+  var options = optionsWith(url, authToken);
   request.post(options, function getResponse(err, response, body) {
     if (err) {
       console.error(err.message);
@@ -48,7 +48,7 @@ function logResponse(response) {
 
 function processErrors(response, body, id) {
   xml2js(body, function(err, response) {
-    var message = util.format("Execution '%s' failed. %s", id, errorMessage(response));
+    var message = util.format("Job '%s' failed. %s", id, errorMessage(response));
     console.error(message);
     return message;
   });

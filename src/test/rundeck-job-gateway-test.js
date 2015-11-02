@@ -20,21 +20,18 @@ describe('Rundeck Job Gateway', function () {
       sinon
         .stub(request, 'post')
         .withArgs({
-          url: util.format("http://example.com:4000/api/13/job/%s/run", id),
+          url: util.format("http://example.com:4000/api/13/job/%s/run?argString=-argument%20value", id),
           headers: {
             'User-Agent': 'node-rundeck',
             'X-Rundeck-Auth-Token': token
-          },
-          body: JSON.stringify({
-            'argString': '-argument value'
-          })
+          }
         }, sinon.match.any)
         .yields(null,
           {
             statusCode: 200,
             statusMessage: 'OK',
             request: {
-              href: 'http://example.com:4000/api/13/job/1/run'
+              href: 'http://example.com:4000/api/13/job/1/run?argString=-argument%20value'
             }
           },
           payload);
@@ -51,21 +48,18 @@ describe('Rundeck Job Gateway', function () {
       sinon
         .stub(request, 'post')
         .withArgs({
-          url: util.format("http://example.com:4000/api/13/job/%s/run", id),
+          url: util.format("http://example.com:4000/api/13/job/%s/run?argString=-argument%20value", id),
           headers: {
             'User-Agent': 'node-rundeck',
             'X-Rundeck-Auth-Token': token
-          },
-          body: JSON.stringify({
-            'argString': '-argument value'
-          })
+          }
         }, sinon.match.any)
         .yields(null,
           {
             statusCode: 400,
             statusMessage: 'Bad Request',
             request: {
-              href: 'http://example.com:4000/api/13/job/1/run'
+              href: 'http://example.com:4000/api/13/job/1/run?argString=-argument%20value'
             }
           },
           badRequestPayload);
@@ -77,7 +71,7 @@ describe('Rundeck Job Gateway', function () {
       var spy = sinon.spy();
 
       var message = 'Something bad happened';
-      execute('http://example.com', 4000, 13, token, id, '', spy);
+      execute('http://example.com', 4000, 13, token, id, '-argument value', spy);
       expect(console.error).to.have.been.calledWith(message);
       expect(spy).to.have.been.calledWith(new Error(message));
 
@@ -92,7 +86,7 @@ describe('Rundeck Job Gateway', function () {
 
       execute('http://example.com', 4000, 13, token, id, '-argument value', function(err, result) {
         expect(console.log).to.have.been
-          .calledWith('POST http://example.com:4000/api/13/job/1/run returned 200 OK');
+          .calledWith('POST http://example.com:4000/api/13/job/1/run?argString=-argument%20value returned 200 OK');
 
         request.post.restore();
         console.log.restore();
@@ -125,7 +119,7 @@ describe('Rundeck Job Gateway', function () {
       stubFailedResponse();
       var spy = sinon.spy();
 
-      var message = "Execution '1' failed. Job options were not valid: Option 'argument' is required.";
+      var message = "Job '1' failed. Job options were not valid: Option 'argument' is required.";
       execute('http://example.com', 4000, 13, token, id, '-argument value', spy);
       expect(console.error).to.have.been.calledWith(message);
       expect(spy).to.have.been.calledWith(new Error(message));
