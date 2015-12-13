@@ -1,7 +1,8 @@
-var request = require('request');
+var P = require('bluebird');
+var http = require('http-as-promised');
 var query = require("querystring");
 var util = require('util');
-var xml2js = require('xml2js').parseString;
+var xml2js = P.promisifyAll(require('xml2js'));
 
 function executeJobUrl(host, port, apiVersion, id, arguments) {
   var queryString = query.stringify({argString: arguments});
@@ -9,53 +10,37 @@ function executeJobUrl(host, port, apiVersion, id, arguments) {
     host, port, apiVersion, id, queryString);
 }
 
-function optionsWith(url, authToken) {
+function options(url, authToken) {
   return {
     url: url,
     headers: {
       'User-Agent': 'node-rundeck',
       'X-Rundeck-Auth-Token': authToken
-    }
+    },
+    resolve: 'body'
   };
 };
 
-function execute(host, port, apiVersion, authToken, id, arguments, callback) {
+function execute(host, port, apiVersion, authToken, id, arguments) {
   var url = executeJobUrl(host, port, apiVersion, id, arguments)
-  var options = optionsWith(url, authToken);
-  request.post(options, function getResponse(err, response, body) {
-    if (err) {
-      console.error(err.message);
-      return callback(err);
-    }
-    logResponse(response);
-    if (response.statusCode != 200) {
-      callback(new Error(processErrors(response, body, id)));
-    } else {
-      xml2js(body, function(err, response) {
-        callback(null, response);
-      });
-    }
-  });
+  return http
+    .post(options(url, authToken))
+    .then(handleExecutionResponse)
+    .catch(logFailedRequest);
 }
 
-function logResponse(response) {
-  var entry = util.format("POST %s returned %d %s",
-    response.request.href,
-    response.statusCode,
-    response.statusMessage);
-  console.log(entry);
+function handleExecutionResponse(body) {
+  return xml2js.parseStringAsync(body);
 }
 
-function processErrors(response, body, id) {
-  xml2js(body, function(err, response) {
-    var message = util.format("Job '%s' failed. %s", id, errorMessage(response));
-    console.error(message);
-    return message;
-  });
-}
-
-function errorMessage(response) {
-  return response.result.error[0].message[0];
+function logFailedRequest(err) {
+  var error = util.format("%s %s returned %s",
+    err.options.method,
+    err.options.url,
+    err.message);
+  console.error(error);
+  console.error(err.body);
+  throw new Error(error);
 }
 
 module.exports = execute;

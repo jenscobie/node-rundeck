@@ -29,24 +29,26 @@ function options(url, authToken) {
   };
 };
 
-function logFailedRequest(err) {
-  var error = util.format("%s %s returned %s",
-    err.options.method,
-    err.options.url,
-    err.message);
-  console.error(error);
-  throw new Error(error);
-}
-
 function getExecution(host, port, apiVersion, authToken, id) {
   var url = executionResource(host, port, apiVersion, id);
-  return http(options(url, authToken))
+  return http
+    .get(options(url, authToken))
     .then(handleExecutionResponse)
     .catch(logFailedRequest);
 }
 
 function handleExecutionResponse(body) {
   return xml2js.parseStringAsync(body);
+}
+
+function logFailedRequest(err) {
+  var error = util.format("%s %s returned %s",
+    err.options.method,
+    err.options.url,
+    err.message);
+  console.error(error);
+  console.error(err.body);
+  throw new Error(error);
 }
 
 function getOutput(host, port, apiVersion, authToken, id, callback) {
