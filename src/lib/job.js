@@ -3,7 +3,8 @@ var request = require('request');
 var util = require('util');
 var xml2js = require('xml2js').parseString;
 var execute = require('../lib/rundeck-job-gateway');
-var get = require('../lib/rundeck-execution-gateway');
+var getExecution = require('../lib/rundeck-execution-gateway').getExecution;
+var getOutput = require('../lib/rundeck-execution-gateway').getOutput;
 
 function run(host, port, apiVersion, authToken, id, arguments, done) {
 
@@ -18,7 +19,7 @@ function run(host, port, apiVersion, authToken, id, arguments, done) {
   }
 
   function pollExecutionStatus(executionId, callback) {
-    get(host, port, apiVersion, authToken, executionId, function(err, response) {
+    getExecution(host, port, apiVersion, authToken, executionId, function(err, response) {
       if (err) return callback(err);
       callback(null, response);
     });
