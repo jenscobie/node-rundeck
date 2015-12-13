@@ -29,11 +29,12 @@ describe('Rundeck Job Gateway', function () {
 
       nock('http://example.com:4000')
         .post(runResource)
-        .reply(500);
+        .reply(400, badRequestPayload);
 
       execute('http://example.com', 4000, 13, token, id, '-argument value')
         .catch(function(err) {
-          expect(console.error).to.have.been.calledWith(error(500, 'Internal Server Error'));
+          expect(console.error).to.have.been.calledWith(error(400, 'Bad Request'));
+          expect(console.error).to.have.been.calledWith(badRequestPayload);
 
           console.error.restore();
           done();
@@ -52,24 +53,6 @@ describe('Rundeck Job Gateway', function () {
           expect(err.message).to.equal(error(500, 'Internal Server Error'));
 
           console.error.restore();
-          done();
-        });
-    });
-
-    it('should return error when client sends a bad request', function(done) {
-      sinon.stub(console, 'error');
-      sinon.stub(console, 'log');
-
-      nock('http://example.com:4000')
-        .post(runResource)
-        .reply(400, badRequestPayload);
-
-      execute('http://example.com', 4000, 13, token, id, '-argument value')
-        .catch(function(err) {
-          expect(err.message).to.equal(error(400, 'Bad Request'));
-
-          console.error.restore();
-          console.log.restore();
           done();
         });
     });
