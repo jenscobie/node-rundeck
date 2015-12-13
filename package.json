@@ -1,6 +1,6 @@
 {
   "name": "rundeck",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "description": "An incomplete implementation of a Rundeck API client",
   "main": "./index",
   "bin": {
@@ -19,7 +19,9 @@
   "homepage": "https://github.com/jenscobie/node-rundeck#readme",
   "dependencies": {
     "async": "^1.4.2",
+    "bluebird": "^3.0.6",
     "commander": "^2.8.1",
+    "http-as-promised": "^1.1.0",
     "request": "^2.64.0",
     "xml2js": "^0.4.12"
   },
@@ -29,6 +31,7 @@
     "istanbul": "^0.3.22",
     "mocha": "^2.3.3",
     "mocha-sinon": "^1.1.4",
+    "nock": "^3.4.0",
     "sinon": "^1.17.1",
     "sinon-chai": "^2.8.0"
   },
