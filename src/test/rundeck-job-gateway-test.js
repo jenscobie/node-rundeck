@@ -16,6 +16,7 @@ describe('Rundeck Job Gateway', function () {
     var id = 1;
     var payload = fs.readFileSync('./src/test/data/job-run.xml', 'ascii');
     var badRequestPayload = fs.readFileSync('./src/test/data/job-error.xml', 'ascii');
+    var runResource = '/api/13/job/1/run?argString=-argument%20value';
 
     function error(code, message) {
       return util.format("POST http://example.com:4000/api/13/job/1/run?argString=-argument%20value returned %d %s",
@@ -27,13 +28,13 @@ describe('Rundeck Job Gateway', function () {
       sinon.stub(console, 'error');
 
       nock('http://example.com:4000')
-        .post('/api/13/job/1/run?argString=-argument%20value')
+        .post(runResource)
         .reply(500);
 
       execute('http://example.com', 4000, 13, token, id, '-argument value')
         .catch(function(err) {
           expect(console.error).to.have.been.calledWith(error(500, 'Internal Server Error'));
-          
+
           console.error.restore();
           done();
         });
@@ -43,7 +44,7 @@ describe('Rundeck Job Gateway', function () {
       sinon.stub(console, 'error');
 
       nock('http://example.com:4000')
-        .post('/api/13/job/1/run?argString=-argument%20value')
+        .post(runResource)
         .reply(500);
 
       execute('http://example.com', 4000, 13, token, id, '-argument value')
@@ -60,7 +61,7 @@ describe('Rundeck Job Gateway', function () {
       sinon.stub(console, 'log');
 
       nock('http://example.com:4000')
-        .post('/api/13/job/1/run?argString=-argument%20value')
+        .post(runResource)
         .reply(400, badRequestPayload);
 
       execute('http://example.com', 4000, 13, token, id, '-argument value')
@@ -77,7 +78,7 @@ describe('Rundeck Job Gateway', function () {
       sinon.stub(console, 'log');
 
       nock('http://example.com:4000')
-        .post('/api/13/job/1/run?argString=-argument%20value')
+        .post(runResource)
         .reply(200, payload);
 
       execute('http://example.com', 4000, 13, token, id, '-argument value')
