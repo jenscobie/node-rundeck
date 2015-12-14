@@ -19,6 +19,7 @@
   "homepage": "https://github.com/jenscobie/node-rundeck#readme",
   "dependencies": {
     "async": "^1.4.2",
+    "async-while": "^1.1.0",
     "bluebird": "^3.0.6",
     "commander": "^2.8.1",
     "http-as-promised": "^1.1.0",

@@ -10,6 +10,11 @@ var execute = require('../lib/rundeck-job-gateway');
 chai.use(sinonChai);
 
 describe('Rundeck Job Gateway', function () {
+
+  afterEach(function() {
+    nock.cleanAll();
+  });
+
   describe('POST /api/13/job/id/run', function () {
 
     var token = 'token';

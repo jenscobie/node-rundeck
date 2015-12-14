@@ -10,6 +10,11 @@ var getOutput = require('../lib/rundeck-execution-gateway').getOutput;
 chai.use(sinonChai);
 
 describe('Rundeck Execution Gateway', function () {
+
+  afterEach(function() {
+    nock.cleanAll();
+  });
+
   describe('GET /api/13/execution/id', function () {
 
     var token = 'token';

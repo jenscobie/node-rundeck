@@ -26,9 +26,10 @@ program
     });
 
     var arguments = options.arguments || '';
-    rundeck.executeJob(id, arguments, function(err) {
-      if (err) process.exit(1);
-      process.exit(0);
+    rundeck
+      .executeJob(id, arguments)
+      .then(() => { process.exit(0); })
+      .catch(() => { process.exit(1); }))
     });
   });
 
