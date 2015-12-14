@@ -51,8 +51,8 @@ function logFailedRequest(err) {
   throw new Error(error);
 }
 
-function getOutput(host, port, apiVersion, authToken, id, callback) {
-  var url = outputResource(host, port, apiVersion, id);
+function getOutput(host, port, apiVersion, authToken, executionId) {
+  var url = outputResource(host, port, apiVersion, executionId);
   return http(options(url, authToken))
     .then(handleOutputResponse)
     .catch(logFailedRequest);

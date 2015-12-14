@@ -36,7 +36,7 @@ describe('Runeck Job', function () {
         .reply(200, failedPayload);
 
       run('http://example.com', 4000, 13, token, id, '-argument value')
-        .catch(function(err) {
+        .catch((err) => {
           expect(console.error).to.have.been.calledWith("Execution of job '1' failed");
 
           console.error.restore();
@@ -56,7 +56,7 @@ describe('Runeck Job', function () {
         .reply(200, failedPayload);
 
       run('http://example.com', 4000, 13, token, id, '-argument value')
-        .catch(function(err) {
+        .catch((err) => {
           expect(err.message).to.equal("Execution of job '1' failed");
 
           console.error.restore();

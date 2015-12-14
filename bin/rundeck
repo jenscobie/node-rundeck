@@ -29,8 +29,7 @@ program
     rundeck
       .executeJob(id, arguments)
       .then(() => { process.exit(0); })
-      .catch(() => { process.exit(1); }))
-    });
+      .catch(() => { process.exit(1); });
   });
 
 program.parse(process.argv);

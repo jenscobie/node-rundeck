@@ -17,24 +17,26 @@ function getStatus(response) {
   return execution.$.status;
 }
 
-function isFailed(response, id) {
-  var message = util.format("Execution of job '%s' failed", id);
+function message(executionId, status) {
+  return util.format("Execution of job '%s' %s", executionId, status);
+}
+
+function isFailed(response, executionId) {
   var status = getStatus(response);
   if (status === 'failed') {
-    console.error(message);
-    throw new Error(message);
+    throw new Error(message(executionId, 'failed'));
   }
   return false;
 }
 
-function isSucceeded(response, id) {
-  var message = util.format("Execution of job '%s' succeeded", id);
+function isSucceeded(response, executionId) {
   var status = getStatus(response);
-  if (status === 'succeeded') {
-    console.log(message);
-    return true;
-  }
-  return false;
+  return status === 'succeeded';
+}
+
+function isComplete(response, executionId) {
+  return isSucceeded(response, executionId) ||
+    isFailed(response, executionId);
 }
 
 function run(host, port, apiVersion, authToken, id, arguments) {
@@ -46,11 +48,7 @@ function run(host, port, apiVersion, authToken, id, arguments) {
     var status = getStatus(response);
 
     var loop = asyncWhile(
-      (response) =>
-      {
-        isFailed(response, id);
-        return !isSucceeded(response, id);
-      },
+      (response) => { return !isComplete(response, executionId); },
       (response) =>
       {
         return P.delay(500)
@@ -60,7 +58,14 @@ function run(host, port, apiVersion, authToken, id, arguments) {
       }
     );
 
-    return loop(response);
+    return loop(response)
+      .then(() => {
+        console.log(message(executionId, 'succeeded'));
+      })
+      .catch((err) => {
+        console.error(message(executionId, 'failed'));
+        throw err;
+      })
   }
 }
 
